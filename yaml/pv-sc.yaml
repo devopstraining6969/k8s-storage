@@ -1,0 +1,26 @@
+#https://kubernetes.io/docs/concepts/storage/
+#https://kubernetes.io/docs/concepts/storage/volumes/
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name:  mongo-sc-pv
+spec:
+  storageClassName: "mongo-storage"
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany #Allow multiply nodes to read and write to this persistance volume
+    #- ReadWriteOnce #Allow single node to read and write to this persistance volume
+    #- ReadOnlyOnce #Allow multiply nodes to read from this persistance volume
+    #- ReadOnlyMany #Allow single node to read from this persistance volume
+    #- ReadWriteOncePod #Allow single pod to read and write to this persistance volume
+  local:
+    path: /storage/data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - node-01

@@ -1,0 +1,10 @@
+#https://kubernetes.io/docs/concepts/storage/storage-classes/
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: mongo-storage
+provisioner: kubernetes.io/no-provisioner
+#volumeBindingMode: Immediate #The pv will be create immediately even if their is no pvc claim
+volumeBindingMode: WaitForFirstConsumer #The pv will not be create until the pvc will be ask the storage class a pv  
+reclaimPolicy: Delete #If the pvc has been deleted the pv will also will be delete
+#reclaimPolicy: Retain #Even if the pvc has been deleted the pv will not be deleted

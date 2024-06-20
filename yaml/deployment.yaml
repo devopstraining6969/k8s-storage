@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      #Mongodb container
+        - image: mongo
+          name:  mongo
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "205m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          args: ["--dbpath", "/data/db"]
+          env:
+            - name: MONGO_INIT_ROOT_USERNAME
+              value: "admin"
+            - name: MONGO_INIT_ROOT_PASSWORD
+              value: "admin"
+          volumeMounts:
+           - mountPath:  "/data/db"
+             name: mongo-volume
+        
+        #Mysql container
+        - image: mysql
+          name:  mysql
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "205m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          args: ["--dbpath", "/data/db"]
+          env:
+            - name: MONGO_INIT_ROOT_USERNAME
+              value: "admin"
+            - name: MONGO_INIT_ROOT_PASSWORD
+              value: "admin"
+          volumeMounts:
+           - mountPath:  "/mysql-db/data"
+             name: mongo-volume
+      
+      volumes:
+        - name:  mongo-volume #Mongo volume
+          persistentVolumeClaim:
+           claimName: mongo-sc-pvc
+        
+        - name: mysql-volume #Mysql volume
+          persistentVolumeClaim:
+            claimName: mysql-volume
+          #emptyDir: {} - In the pod level
